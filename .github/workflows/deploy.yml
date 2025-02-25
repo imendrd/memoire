@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted  # Utiliser le runner Ubuntu auto-hébergé
 
     steps:
       - name: Récupérer le code source
@@ -15,7 +15,7 @@ jobs:
 
       - name: Vérifier le contenu du dépôt (debug)
         run: ls -R
-          
+
       - name: Se déplacer dans le dossier du service utilisateur
         working-directory: service-utilisateur
 
