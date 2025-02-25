@@ -1,44 +1,29 @@
-name: 🚀 CI/CD - Service Utilisateur
+name: Déploiement Service Utilisateur
 
 on:
   push:
     branches:
-      - main  # Déclenchement du workflow à chaque push sur "main"
-  pull_request:
-    branches:
-      - main  # Vérification sur les PRs
+      - main
 
 jobs:
-  build-and-deploy:
-    runs-on: ubuntu-latest  # Exécuter le workflow sur un serveur Ubuntu
+  build:
+    runs-on: ubuntu-latest
 
     steps:
-      - name: 📥 Cloner le dépôt
+      - name: Récupérer le code source
         uses: actions/checkout@v3
 
-      - name: 🛠️ Installer Node.js et les dépendances
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18
+      - name: Vérifier le contenu du dépôt (debug)
+        run: ls -R
+          
+      - name: Se déplacer dans le dossier du service utilisateur
+        working-directory: service-utilisateur
 
-      - run: npm install
+      - name: Installer les dépendances
+        run: npm install
 
-      - name: 🧪 Lancer les tests (si disponibles)
-        run: npm test  # Assure-toi que tes tests fonctionnent
+      - name: Lancer les tests
+        run: npm test
 
-      - name: 🐳 Connexion à Docker Hub
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-
-      - name: 🏗️ Build et push de l'image Docker
-        run: |
-          docker build -t imend/service-utilisateur:latest ./service-utilisateur
-          docker tag imend/service-utilisateur:latest imend/service-utilisateur:v1
-          docker push imend/service-utilisateur:latest
-          docker push imend/service-utilisateur:v1
-
-      - name: 🚀 Déploiement
-        run: |
-          docker-compose up -d
+      - name: Construire l'application
+        run: npm run build
