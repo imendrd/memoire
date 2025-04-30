@@ -1,17 +1,26 @@
-const mongoose = require('mongoose');
-const bcrypt = require('bcrypt');
+const { DataTypes } = require('sequelize');
+const bcrypt = require('bcryptjs');
+const sequelize = require('../config/database'); // Connexion PostgreSQL
 
-const userSchema = new mongoose.Schema({
-  email: { type: String, required: true, unique: true },
-  password: { type: String, required: true },
+const User = sequelize.define('User', {
+  email: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    unique: true,
+    validate: {
+      isEmail: true,
+    },
+  },
+  password: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+}, {
+  hooks: {
+    beforeCreate: async (user) => {
+      user.password = await bcrypt.hash(user.password, 10);
+    },
+  },
 });
 
-// Hacher le mot de passe avant de sauvegarder l'utilisateur
-userSchema.pre('save', async function (next) {
-  if (this.isModified('password')) {
-    this.password = await bcrypt.hash(this.password, 10);
-  }
-  next();
-});
-
-module.exports = mongoose.model('User', userSchema);
+module.exports = User;

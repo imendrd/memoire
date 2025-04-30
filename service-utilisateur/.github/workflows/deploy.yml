@@ -1,0 +1,30 @@
+name: 🚀 Déploiement Service Utilisateur
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: [self-hosted, linux]  # Utiliser le runner auto-hébergé sous Linux
+
+    services:
+      mongodb:
+        image: mongo:5.0
+        options: --health-cmd "echo 'exit 0'" --health-interval 10s --health-timeout 2s --health-retries 3
+
+    steps:
+      - name: 🔄 Cloner le dépôt
+        uses: actions/checkout@v4
+
+      - name: 📦 Installer Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18  # Version de Node.js à installer
+
+      - name: 📥 Installer les dépendances
+        run: npm install  # Installer les dépendances du projet
+
+      - name: 🚀 Lancer l'application
+        run: node index.js  # Démarrer l'application

@@ -1,0 +1,49 @@
+version: '3.8'  # Version Docker Compose
+
+services:
+  # Base de données MongoDB
+  mongodb:
+    image: mongo
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+
+  # Service Notification
+  service-notification:
+    build: ./service-notification  # Assurez-vous que le chemin est correct
+    container_name: service-notification
+    ports:
+      - "6001:6001"
+    depends_on:
+      - mongodb
+    environment:
+      - MONGO_URI=mongodb://mongodb:27017/notification-app
+
+  # Service Utilisateur
+  service-utilisateur:
+    build: ./service-utilisateur
+    container_name: service-utilisateur
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mongodb
+    environment:
+      - PORT=3000
+      - MONGO_URI=mongodb://mongodb:27017/todo-app
+
+  # Service Tâches
+  service-tache:
+    image: service-tache:v1
+    container_name: service-tache
+    ports:
+      - "3001:3001"
+    depends_on:
+      - mongodb
+    environment:
+      - MONGO_URI=mongodb://mongodb:27017/tache-db
+
+volumes:
+  mongodb_data:
+    driver: local

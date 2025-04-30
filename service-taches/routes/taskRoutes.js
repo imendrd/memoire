@@ -1,8 +1,18 @@
 const express = require('express');
 const router = express.Router();
-const Task = require('../models/Task'); // Assurez-vous que le modèle est correct
+const Task = require('../models/Task'); // Assurez-vous que le chemin est correct
 
-// Création d'une tâche
+// ✅ Route pour récupérer toutes les tâches
+router.get('/', async (req, res) => {
+    try {
+        const tasks = await Task.find();
+        res.json(tasks);
+    } catch (error) {
+        res.status(500).json({ message: "Erreur lors de la récupération des tâches", error });
+    }
+});
+
+// Route pour créer une tâche
 router.post('/', async (req, res) => {
     try {
         const { title, description, dueDate, userId } = req.body;
